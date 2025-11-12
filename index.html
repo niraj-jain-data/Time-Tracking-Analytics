@@ -27,9 +27,8 @@
           <p class="text-xs text-slate-500 mt-1">If left blank, 2 years = 730 days is used (default).</p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-slate-700">Vacation days per year (assumption)</label>
+          <label class="block text-sm font-medium text-slate-700">Vacation days per year (optional)</label>
           <input id="vacPerYear" type="number" min="0" value="25" class="mt-1 block w-full rounded-md border-slate-200 shadow-sm" />
-          <p class="text-xs text-slate-500 mt-1">Change this to match your typical leave.</p>
         </div>
         <div class="text-right">
           <button id="startBtn" class="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">Start</button>
@@ -77,7 +76,7 @@
             </div>
 
             <div class="text-sm text-slate-500">
-              <p>Steps: Sleep → Eating → Exercise → Pooja → Social → Vacation → Result</p>
+              <p>Steps: Sleep → Eating → Social → Personal (~120 days) → Result</p>
             </div>
           </div>
 
@@ -97,19 +96,11 @@
                 <div class="mono" id="tbEat"></div>
               </div>
               <div class="flex justify-between">
-                <div>Exercise (1h/day)</div>
-                <div class="mono" id="tbExercise"></div>
-              </div>
-              <div class="flex justify-between">
-                <div>Pooja (1h/day)</div>
-                <div class="mono" id="tbPooja"></div>
-              </div>
-              <div class="flex justify-between">
                 <div>Social media (1h/day)</div>
                 <div class="mono" id="tbSocial"></div>
               </div>
               <div class="flex justify-between">
-                <div>Vacation (user adjustable)</div>
+                <div>Personal: Exercise + Pooja + Vacation (~120 days)</div>
                 <div class="mono" id="tbVacation"></div>
               </div>
               <hr class="my-2" />
@@ -163,7 +154,7 @@
         </section>
 
         <footer class="mt-4 text-xs text-slate-500">
-          <p>Tip: Change vacation days if you take more/less leave. If your 2-year period contains a leap day, add 24 hours.</p>
+          <p>Tip: Adjust personal days if needed. If your 2-year period contains a leap day, add 24 hours.</p>
         </footer>
       </div>
     </main>
@@ -172,12 +163,13 @@
   <script>
     const DAY_HOURS = 24;
     const defaultDays = 730;
+    const mergedBlockHours = 120 * 24;
+
     const stepList = [
       { key: 'sleep', label: 'Sleep (8h/day)', hours: 8 * defaultDays },
       { key: 'eat', label: 'Eating (2h/day)', hours: 2 * defaultDays },
-      { key: 'exercise', label: 'Exercise (1h/day)', hours: 1 * defaultDays },
-      { key: 'pooja', label: 'Pooja (1h/day)', hours: 1 * defaultDays },
       { key: 'social', label: 'Social media (1h/day)', hours: 1 * defaultDays },
+      { key: 'merged', label: 'Personal: Exercise + Pooja + Vacation', hours: mergedBlockHours },
     ];
 
     let state = {
@@ -185,19 +177,16 @@
       totalHours: defaultDays * 24,
       stepIndex: -1,
       removedHours: 0,
-      vacationHours: 1200
     };
 
     const flowContainer = document.getElementById('flowContainer');
     const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
     const resetBtn = document.getElementById('resetBtn');
-    const pswEnd = document.getElementById('pswEnd');
-    const vacPerYear = document.getElementById('vacPerYear');
 
     function formatDaysHours(hours) {
       const days = hours / 24;
-      return `${Math.round(days)} days (${Math.round(hours)} h)`;
+      return `${Math.round(days)} days(${Math.round(hours)} h)`;
     }
 
     function refreshUI() {
@@ -208,15 +197,13 @@
       document.getElementById('remainingDays').innerText = `${Math.round(leftHours / 24)} days`;
       document.getElementById('remainingHours').innerText = `${Math.round(leftHours)} hours`;
 
-      document.getElementById('removedHours').innerText = `${Math.round(state.removedHours)} h`;
-      document.getElementById('remHoursCard').innerText = `${Math.round(leftHours)} h`;
+      document.getElementById('removedHours').innerText = formatDaysHours(state.removedHours);
+      document.getElementById('remHoursCard').innerText = formatDaysHours(leftHours);
 
       document.getElementById('tbSleep').innerText = formatDaysHours(8 * state.totalDays);
       document.getElementById('tbEat').innerText = formatDaysHours(2 * state.totalDays);
-      document.getElementById('tbExercise').innerText = formatDaysHours(1 * state.totalDays);
-      document.getElementById('tbPooja').innerText = formatDaysHours(1 * state.totalDays);
       document.getElementById('tbSocial').innerText = formatDaysHours(1 * state.totalDays);
-      document.getElementById('tbVacation').innerText = formatDaysHours(state.vacationHours);
+      document.getElementById('tbVacation').innerText = formatDaysHours(mergedBlockHours);
 
       const removedSum = state.removedHours;
       const leftSum = state.totalHours - removedSum;
@@ -224,9 +211,9 @@
       document.getElementById('tbLeft').innerText = formatDaysHours(leftSum);
 
       const idx = state.stepIndex;
-      const stepName = idx >= 0 && idx < stepList.length ? stepList[idx].label : (idx === stepList.length ? 'Vacation' : 'Initial');
+      const stepName = idx >= 0 && idx < stepList.length ? stepList[idx].label : 'Initial';
       document.getElementById('stepTitle').innerText = 'Step ' + Math.max(0, idx + 1) + ' — ' + stepName;
-      document.getElementById('stepDesc').innerText = idx >= 0 ? 'Removed: ' + formatDaysHours((idx < stepList.length) ? stepList[idx].hours : state.vacationHours) : 'Click Next to remove the first time block.';
+      document.getElementById('stepDesc').innerText = idx >= 0 ? 'Removed: ' + formatDaysHours(stepList[idx].hours) : 'Click Next to remove the first time block.';
 
       const finalLeftHours = Math.round(leftSum);
       document.getElementById('finalLeftDays').innerText = `${Math.round(finalLeftHours / 24)} days`;
@@ -236,19 +223,14 @@
       document.getElementById('allocReserve').innerText = formatDaysHours(finalLeftHours * 0.25);
     }
 
-    function computeVacationHours() {
-      const vacY = Number(vacPerYear.value) || 25;
-      const vacDays = vacY * (state.totalDays / 365);
-      state.vacationHours = vacDays * 24;
-      return state.vacationHours;
-    }
-
     startBtn.addEventListener('click', () => {
-      const endVal = pswEnd.value;
-      state.totalDays = endVal ?  Math.round((new Date(endVal) - (new Date(endVal) - 730 * 86400000)) / 86400000) : defaultDays;
+      state.totalDays = defaultDays;
       state.totalHours = state.totalDays * 24;
-      stepList.forEach((s, i) => s.hours = [8, 2, 1, 1, 1][i] * state.totalDays);
-      computeVacationHours();
+      stepList.forEach((s, i) => {
+        if (s.key !== 'merged') {
+          s.hours = [8, 2, 1][i] * state.totalDays;
+        }
+      });
       state.stepIndex = -1;
       state.removedHours = 0;
       flowContainer.classList.remove('hidden');
@@ -257,13 +239,12 @@
     });
 
     nextBtn.addEventListener('click', () => {
-      if (state.stepIndex < stepList.length) {
+      if (state.stepIndex < stepList.length - 1) {
         state.stepIndex++;
-        if (state.stepIndex < stepList.length) state.removedHours += stepList[state.stepIndex].hours;
-        else { computeVacationHours(); state.removedHours += state.vacationHours; }
+        state.removedHours += stepList[state.stepIndex].hours;
         refreshUI();
       }
-      if (state.stepIndex >= stepList.length) document.getElementById('finalCard').classList.remove('hidden');
+      if (state.stepIndex >= stepList.length - 1) document.getElementById('finalCard').classList.remove('hidden');
     });
 
     resetBtn.addEventListener('click', () => {
@@ -273,11 +254,7 @@
       document.getElementById('finalCard').classList.add('hidden');
     });
 
-    vacPerYear.addEventListener('change', () => {
-      if (!flowContainer.classList.contains('hidden')) { computeVacationHours(); refreshUI(); }
-    });
-
-    (function init(){ computeVacationHours(); refreshUI(); })();
+    refreshUI();
   </script>
 </body>
 </html>
