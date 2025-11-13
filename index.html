@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PSW 2-Year Time Flow — Upskilling & Job Prep</title>
+  <title>PSW Time Flow — Upskilling & Job Prep</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .card { min-height: 120px; }
@@ -15,20 +15,22 @@
 <body class="bg-slate-50 text-slate-800">
   <div class="max-w-4xl mx-auto p-6">
     <header class="mb-6">
-      <h1 class="text-2xl font-semibold">PSW 2-Year Time Flow — How much time left for upskilling & job hunt</h1>
-      <p class="text-sm text-slate-600 mt-2">Enter your PSW end date (optional). Click <strong>Start</strong>, then use <strong>Next</strong> to walk through each time removal step-by-step.</p>
+      <h1 class="text-2xl font-semibold">PSW Time Flow — Upskilling & Job Prep</h1>
+      <p class="text-sm text-slate-600 mt-2">Enter your PSW end date (optional). Click <strong>Start</strong>, then use <strong>Next</strong> to walk through each time-removal step.</p>
     </header>
 
+    <!-- Input section -->
     <div class="bg-white p-6 rounded-xl shadow mb-6">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
         <div>
           <label class="block text-sm font-medium text-slate-700">PSW end date (optional)</label>
           <input id="pswEnd" type="date" class="mt-1 block w-full rounded-md border-slate-200 shadow-sm" />
-          <p class="text-xs text-slate-500 mt-1">If left blank, 2 years = 730 days is used (default).</p>
+          <p class="text-xs text-slate-500 mt-1">Blank = 2 years (730 days).</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700">Vacation days per year (optional)</label>
-          <input id="vacPerYear" type="number" min="0" value="25" class="mt-1 block w-full rounded-md border-slate-200 shadow-sm" />
+          <input id="vacPerYear" type="number" min="0" value="60" class="mt-1 block w-full rounded-md border-slate-200 shadow-sm" />
+          <p class="text-xs text-slate-500 mt-1">Default 60 days / year (120 for 2 years).</p>
         </div>
         <div class="text-right">
           <button id="startBtn" class="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">Start</button>
@@ -36,13 +38,18 @@
       </div>
     </div>
 
+    <!-- Flow container -->
     <main>
       <div id="flowContainer" class="space-y-4 hidden">
+        <!-- Overview -->
         <section class="bg-white p-5 rounded-xl shadow">
           <div class="flex justify-between items-start">
             <div>
               <h2 class="text-lg font-semibold">Overview</h2>
-              <p class="text-sm text-slate-600 mt-1">Total span: <span id="totalDays">—</span> days (<span id="totalHours">—</span> hours)</p>
+              <p class="text-sm text-slate-600 mt-1">Total span:
+                <span id="totalDays">—</span> days (<span id="totalHours">—</span> hours)
+              </p>
+              <p class="text-xs text-slate-500" id="countdownText"></p>
             </div>
             <div class="text-right">
               <p class="text-sm">Remaining (calendar):</p>
@@ -52,12 +59,12 @@
           </div>
         </section>
 
+        <!-- Step cards -->
         <section class="grid md:grid-cols-2 gap-4">
           <div class="space-y-3">
             <div id="stepCard" class="card bg-white p-4 rounded-xl shadow step">
               <h3 class="font-semibold" id="stepTitle">Step 0 — Initial</h3>
               <p class="text-sm text-slate-600 mt-1" id="stepDesc">Click Next to remove the first time block.</p>
-
               <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div class="p-3 bg-slate-50 rounded">
                   <div class="text-xs text-slate-500">Removed so far</div>
@@ -74,184 +81,158 @@
               <button id="nextBtn" class="px-4 py-2 bg-emerald-600 text-white rounded shadow hover:bg-emerald-700">Next</button>
               <button id="resetBtn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded shadow">Reset</button>
             </div>
-
-            <div class="text-sm text-slate-500">
-              <p>Steps: Sleep → Eating → Social → Personal (~120 days) → Result</p>
-            </div>
+            <p class="text-sm text-slate-500">Steps: Sleep → Eating → Social → Personal → Result</p>
           </div>
 
+          <!-- Breakdown -->
           <div class="bg-white p-4 rounded-xl shadow">
-            <h4 class="font-semibold mb-2">Breakdown (per 2-year period)</h4>
+            <h4 class="font-semibold mb-2">Breakdown (per period)</h4>
             <div class="space-y-2">
               <div class="flex justify-between text-sm text-slate-600">
-                <div>Total (2 years)</div>
+                <div>Total period</div>
                 <div class="mono"><span id="tbTotalDays">730</span> d (<span id="tbTotalHours">17520</span> h)</div>
               </div>
-              <div class="flex justify-between">
-                <div>Sleep (8h/day)</div>
-                <div class="mono" id="tbSleep"></div>
-              </div>
-              <div class="flex justify-between">
-                <div>Eating (2h/day)</div>
-                <div class="mono" id="tbEat"></div>
-              </div>
-              <div class="flex justify-between">
-                <div>Social media (1h/day)</div>
-                <div class="mono" id="tbSocial"></div>
-              </div>
-              <div class="flex justify-between">
-                <div>Personal: Exercise + Pooja + Vacation (~120 days)</div>
-                <div class="mono" id="tbVacation"></div>
-              </div>
+              <div class="flex justify-between"><div>Sleep (8h/day)</div><div class="mono" id="tbSleep"></div></div>
+              <div class="flex justify-between"><div>Eating (2h/day)</div><div class="mono" id="tbEat"></div></div>
+              <div class="flex justify-between"><div>Social media (1h/day)</div><div class="mono" id="tbSocial"></div></div>
+              <div class="flex justify-between"><div>Personal (Exercise + Pooja + Vacation)</div><div class="mono" id="tbVacation"></div></div>
               <hr class="my-2" />
-              <div class="flex justify-between font-semibold">
-                <div>Removed (sum)</div>
-                <div class="mono" id="tbRemoved"></div>
-              </div>
-              <div class="flex justify-between font-semibold">
-                <div>Left (2 years)</div>
-                <div class="mono" id="tbLeft"></div>
-              </div>
+              <div class="flex justify-between font-semibold"><div>Removed (sum)</div><div class="mono" id="tbRemoved"></div></div>
+              <div class="flex justify-between font-semibold"><div>Left</div><div class="mono" id="tbLeft"></div></div>
             </div>
           </div>
         </section>
 
+        <!-- Final allocation -->
         <section id="finalCard" class="bg-white p-5 rounded-xl shadow hidden">
-          <h3 class="font-semibold">Final: Time available for upskilling, interviews & job performance</h3>
+          <h3 class="font-semibold">Final Time Available</h3>
           <div class="mt-3 grid sm:grid-cols-2 gap-4">
             <div>
-              <p class="text-sm text-slate-600">Available calendar time after removals:</p>
+              <p class="text-sm text-slate-600">Available after removals:</p>
               <div class="mono text-2xl font-medium" id="finalLeftDays">— days</div>
               <div class="text-sm text-slate-500" id="finalLeftHours">— hours</div>
             </div>
             <div>
-              <p class="text-sm text-slate-600">6 months requirement:</p>
+              <p class="text-sm text-slate-600">6 months reference:</p>
               <ul class="list-disc ml-5 text-sm mt-2 text-slate-700">
-                <li>Calendar 6 months = <span class="mono">182.5 days (4,380 h)</span></li>
-                <li>Full-time work ≈ <span class="mono">26 weeks × 40 h = 1,040 h</span></li>
+                <li>Calendar ≈ 182.5 days (4 380 h)</li>
+                <li>Work ≈ 26 weeks × 40 h = 1 040 h</li>
               </ul>
             </div>
           </div>
-
           <div class="mt-4">
-            <h4 class="font-semibold">Suggested allocation (example)</h4>
-            <p class="text-sm text-slate-600">You can adjust these later — this is a starting suggestion.</p>
+            <h4 class="font-semibold">Suggested allocation (dynamic)</h4>
+            <p class="text-sm text-slate-600">Ratios adapt to remaining PSW time.</p>
             <div class="grid sm:grid-cols-3 gap-3 mt-3">
-              <div class="p-3 bg-slate-50 rounded">
-                <div class="text-xs text-slate-500">Upskilling</div>
-                <div class="mono text-lg font-medium" id="allocUpskill">—</div>
-              </div>
-              <div class="p-3 bg-slate-50 rounded">
-                <div class="text-xs text-slate-500">Interview prep</div>
-                <div class="mono text-lg font-medium" id="allocInterview">—</div>
-              </div>
-              <div class="p-3 bg-slate-50 rounded">
-                <div class="text-xs text-slate-500">Buffer / Job Performance reserve </div>
-                <div class="mono text-lg font-medium" id="allocReserve">—</div>
-              </div>
+              <div class="p-3 bg-slate-50 rounded"><div class="text-xs text-slate-500">Upskilling</div><div class="mono text-lg font-medium" id="allocUpskill">—</div></div>
+              <div class="p-3 bg-slate-50 rounded"><div class="text-xs text-slate-500">Interview prep</div><div class="mono text-lg font-medium" id="allocInterview">—</div></div>
+              <div class="p-3 bg-slate-50 rounded"><div class="text-xs text-slate-500">Buffer / Job Performance</div><div class="mono text-lg font-medium" id="allocReserve">—</div></div>
             </div>
           </div>
         </section>
 
         <footer class="mt-4 text-xs text-slate-500">
-          <p>Tip: Adjust personal days if needed. If your 2-year period contains a leap day, add 24 hours.</p>
+          Tip: Adjust vacation or personal days if needed. Leap year? Add 24 hours.
         </footer>
       </div>
     </main>
   </div>
 
+  <!-- JS logic -->
   <script>
     const DAY_HOURS = 24;
     const defaultDays = 730;
-    const mergedBlockHours = 120 * 24;
-
     const stepList = [
-      { key: 'sleep', label: 'Sleep (8h/day)', hours: 8 * defaultDays },
-      { key: 'eat', label: 'Eating (2h/day)', hours: 2 * defaultDays },
-      { key: 'social', label: 'Social media (1h/day)', hours: 1 * defaultDays },
-      { key: 'merged', label: 'Personal: Exercise + Pooja + Vacation', hours: mergedBlockHours },
+      { key: 'sleep', label: 'Sleep (8h/day)', hours: 0 },
+      { key: 'eat', label: 'Eating (2h/day)', hours: 0 },
+      { key: 'social', label: 'Social media (1h/day)', hours: 0 },
+      { key: 'merged', label: 'Personal (Exercise + Pooja + Vacation)', hours: 0 },
     ];
 
-    let state = {
-      totalDays: defaultDays,
-      totalHours: defaultDays * 24,
-      stepIndex: -1,
-      removedHours: 0,
-    };
+    let state = { totalDays: defaultDays, totalHours: defaultDays*DAY_HOURS, stepIndex:-1, removedHours:0 };
 
-    const flowContainer = document.getElementById('flowContainer');
-    const startBtn = document.getElementById('startBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const resetBtn = document.getElementById('resetBtn');
+    const el = id => document.getElementById(id);
+    const flowContainer = el('flowContainer');
 
-    function formatDaysHours(hours) {
-      const days = hours / 24;
-      return `${Math.round(days)} days(${Math.round(hours)} h)`;
+    function formatDaysHours(h){const d=h/24;return `${Math.round(d)} days (${Math.round(h)} h)`;}
+    function getAllocRatios(d){if(d>=365)return[.5,.25,.25];if(d>=182)return[.4,.35,.25];return[.3,.45,.25];}
+    function formatCountdown(days){const y=Math.floor(days/365);const m=Math.floor((days%365)/30);const r=days-y*365-m*30;return`${y}y ${m}m ${r}d remaining`; }
+
+    function refreshUI(){
+      const left=state.totalHours-state.removedHours;
+      el('totalDays').innerText=state.totalDays;
+      el('totalHours').innerText=state.totalHours;
+      el('remainingDays').innerText=`${Math.max(0,Math.round(left/24))} days`;
+      el('remainingHours').innerText=`${Math.max(0,Math.round(left))} hours`;
+      el('countdownText').innerText=formatCountdown(state.totalDays);
+      el('removedHours').innerText=formatDaysHours(state.removedHours);
+      el('remHoursCard').innerText=formatDaysHours(left);
+
+      el('tbSleep').innerText=formatDaysHours(8*state.totalDays);
+      el('tbEat').innerText=formatDaysHours(2*state.totalDays);
+      el('tbSocial').innerText=formatDaysHours(1*state.totalDays);
+      const vacDays=(parseFloat(el('vacPerYear').value||60)*(state.totalDays/365));
+      el('tbVacation').innerText=formatDaysHours(vacDays*24);
+
+      const rem=state.removedHours;const leftSum=Math.max(0,state.totalHours-rem);
+      el('tbRemoved').innerText=formatDaysHours(rem);
+      el('tbLeft').innerText=formatDaysHours(leftSum);
+
+      const idx=state.stepIndex;
+      const stepName=idx>=0&&idx<stepList.length?stepList[idx].label:'Initial';
+      el('stepTitle').innerText=`Step ${Math.max(0,idx+1)} — ${stepName}`;
+      el('stepDesc').innerText=idx>=0?`Removed: ${formatDaysHours(stepList[idx].hours)}`:'Click Next to remove the first time block.';
+
+      const finalLeft=Math.max(0,Math.round(leftSum));
+      el('finalLeftDays').innerText=`${Math.round(finalLeft/24)} days`;
+      el('finalLeftHours').innerText=`${finalLeft} hours`;
+
+      const [u,i,b]=getAllocRatios(state.totalDays);
+      el('allocUpskill').innerText=formatDaysHours(finalLeft*u);
+      el('allocInterview').innerText=formatDaysHours(finalLeft*i);
+      el('allocReserve').innerText=formatDaysHours(finalLeft*b);
     }
 
-    function refreshUI() {
-      const leftHours = state.totalHours - state.removedHours;
+    el('startBtn').addEventListener('click',()=>{
+      const endStr=el('pswEnd').value;
+      const today=new Date();let total=defaultDays;
+      if(endStr){
+        const end=new Date(endStr);
+        const diff=Math.round((end-today)/(1000*60*60*24));
+        if(diff<0){alert("❌ End date is earlier than today.");return;}
+        if(diff>730){alert("❌ Duration cannot exceed 2 years (730 days).");return;}
+        total=diff;
+      }
+      state.totalDays=total;state.totalHours=total*DAY_HOURS;
 
-      document.getElementById('totalDays').innerText = state.totalDays;
-      document.getElementById('totalHours').innerText = state.totalHours;
-      document.getElementById('remainingDays').innerText = `${Math.round(leftHours / 24)} days`;
-      document.getElementById('remainingHours').innerText = `${Math.round(leftHours)} hours`;
+      const vacDays=parseFloat(el('vacPerYear').value||60)*(state.totalDays/365);
+      stepList[0].hours=8*total;
+      stepList[1].hours=2*total;
+      stepList[2].hours=1*total;
+      stepList[3].hours=vacDays*24;
 
-      document.getElementById('removedHours').innerText = formatDaysHours(state.removedHours);
-      document.getElementById('remHoursCard').innerText = formatDaysHours(leftHours);
-
-      document.getElementById('tbSleep').innerText = formatDaysHours(8 * state.totalDays);
-      document.getElementById('tbEat').innerText = formatDaysHours(2 * state.totalDays);
-      document.getElementById('tbSocial').innerText = formatDaysHours(1 * state.totalDays);
-      document.getElementById('tbVacation').innerText = formatDaysHours(mergedBlockHours);
-
-      const removedSum = state.removedHours;
-      const leftSum = state.totalHours - removedSum;
-      document.getElementById('tbRemoved').innerText = formatDaysHours(removedSum);
-      document.getElementById('tbLeft').innerText = formatDaysHours(leftSum);
-
-      const idx = state.stepIndex;
-      const stepName = idx >= 0 && idx < stepList.length ? stepList[idx].label : 'Initial';
-      document.getElementById('stepTitle').innerText = 'Step ' + Math.max(0, idx + 1) + ' — ' + stepName;
-      document.getElementById('stepDesc').innerText = idx >= 0 ? 'Removed: ' + formatDaysHours(stepList[idx].hours) : 'Click Next to remove the first time block.';
-
-      const finalLeftHours = Math.round(leftSum);
-      document.getElementById('finalLeftDays').innerText = `${Math.round(finalLeftHours / 24)} days`;
-      document.getElementById('finalLeftHours').innerText = `${finalLeftHours} hours`;
-      document.getElementById('allocUpskill').innerText = formatDaysHours(finalLeftHours * 0.5);
-      document.getElementById('allocInterview').innerText = formatDaysHours(finalLeftHours * 0.25);
-      document.getElementById('allocReserve').innerText = formatDaysHours(finalLeftHours * 0.25);
-    }
-
-    startBtn.addEventListener('click', () => {
-      state.totalDays = defaultDays;
-      state.totalHours = state.totalDays * 24;
-      stepList.forEach((s, i) => {
-        if (s.key !== 'merged') {
-          s.hours = [8, 2, 1][i] * state.totalDays;
-        }
-      });
-      state.stepIndex = -1;
-      state.removedHours = 0;
+      state.stepIndex=-1;state.removedHours=0;
       flowContainer.classList.remove('hidden');
-      document.getElementById('finalCard').classList.add('hidden');
+      el('finalCard').classList.add('hidden');
       refreshUI();
     });
 
-    nextBtn.addEventListener('click', () => {
-      if (state.stepIndex < stepList.length - 1) {
-        state.stepIndex++;
-        state.removedHours += stepList[state.stepIndex].hours;
+    el('nextBtn').addEventListener('click',()=>{
+      if(state.stepIndex<stepList.length-1){
+        const nextIdx=state.stepIndex+1;
+        const nextRemove=stepList[nextIdx].hours;
+        const left=state.totalHours-state.removedHours;
+        if(nextRemove>left){alert("⚠️ Not enough days left to remove further blocks!");return;}
+        state.stepIndex=nextIdx;
+        state.removedHours+=nextRemove;
         refreshUI();
       }
-      if (state.stepIndex >= stepList.length - 1) document.getElementById('finalCard').classList.remove('hidden');
+      if(state.stepIndex>=stepList.length-1){el('finalCard').classList.remove('hidden');}
     });
 
-    resetBtn.addEventListener('click', () => {
-      state.stepIndex = -1;
-      state.removedHours = 0;
-      flowContainer.classList.add('hidden');
-      document.getElementById('finalCard').classList.add('hidden');
+    el('resetBtn').addEventListener('click',()=>{
+      state.stepIndex=-1;state.removedHours=0;
+      flowContainer.classList.add('hidden');el('finalCard').classList.add('hidden');
     });
 
     refreshUI();
